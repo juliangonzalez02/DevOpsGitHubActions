@@ -1,4 +1,13 @@
-"use strict";
+import { describe, expect, it } from "vitest";
+import { add } from "../src/homepage.js";
+
+
+describe("add", () => {
+    it("adds two numbers", () => {
+        expect(add(2, 3)).toBe(5);
+    });
+});
+/*"use strict";
 
 function main()
 {
@@ -64,7 +73,7 @@ function selectPosition()
     }
 
     alert(numColor);
-}*/
+}*
 
 function drawTriangle(numPosition,limit,number)
 {
@@ -85,4 +94,4 @@ function drawTriangle(numPosition,limit,number)
             document.writeln("<br>");
         }
     }
-}
+}*/
