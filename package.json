@@ -7,7 +7,7 @@
   "name": "devopsgithubactions",
   "description": "",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
   "directories": {
     "test": "tests"
   },
