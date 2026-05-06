@@ -1,18 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { add } from "../src/homepage.js";
+"use strict";
 
-
-describe("add", () => {
-    it("adds two numbers", () => {
-        expect(add(2, 3)).toBe(5);
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    main();
 });
-/*"use strict";
 
 function main()
 {
     document.getElementById("txtOp1").value = Number(10);
-    document.getElementById("colors").value = "Red";
+    document.getElementById("colors").value = "Blue";
     document.getElementById("baseBot").checked = true;
 
     document.getElementById("drawTri").onclick = selectPosition;
@@ -73,7 +68,7 @@ function selectPosition()
     }
 
     alert(numColor);
-}*
+}*/
 
 function drawTriangle(numPosition,limit,number)
 {
@@ -94,4 +89,4 @@ function drawTriangle(numPosition,limit,number)
             document.writeln("<br>");
         }
     }
-}*/
+}
