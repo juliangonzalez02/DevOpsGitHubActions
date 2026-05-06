@@ -1,5 +1,9 @@
 "use strict";
 
+document.addEventListener("DOMContentLoaded", () => {
+    main();
+});
+
 function main()
 {
     document.getElementById("txtOp1").value = Number(10);

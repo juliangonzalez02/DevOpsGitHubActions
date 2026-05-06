@@ -12,7 +12,7 @@ describe("add", () => {
 function main()
 {
     document.getElementById("txtOp1").value = Number(10);
-    document.getElementById("colors").value = "Blue";
+    document.getElementById("colors").value = "Red";
     document.getElementById("baseBot").checked = true;
 
     document.getElementById("drawTri").onclick = selectPosition;
