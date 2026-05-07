@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/juliangonzalez02/DevOpsGitHubActions/issues"
   },
-  "homepage": "https://github.com/juliangonzalez02/DevOpsGitHubActions#readme"
+  "homepage": "https://github.com/juliangonzalez02/DevOpsGitHubActions#readme",
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
 }

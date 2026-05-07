@@ -1,18 +1,30 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
-    main();
-});
+export function getPageTitle() {
+    return "DevOps GitHub Actions Lab"
+}
 
-function main()
+export function main()
 {
+    const heading = document.querySelector("#page-title");
+
+    if (heading) {
+        heading.textContent = getPageTitle();
+    }
+/*
     document.getElementById("txtOp1").value = Number(10);
     document.getElementById("colors").value = "Blue";
     document.getElementById("baseBot").checked = true;
 
     document.getElementById("drawTri").onclick = selectPosition;
+*/
 }
 
+if (typeof document !== "undefined") {
+    main();
+}
+
+/*
 function selectPosition()
 {
     let number = Number(document.getElementById("txtOp1").value);
@@ -42,7 +54,7 @@ function selectPosition()
     
 }
 
-/*function selectedColor()
+*function selectedColor()
 {
     let numColor;
     let color = document.getElementsByName("color");
@@ -68,7 +80,7 @@ function selectPosition()
     }
 
     alert(numColor);
-}*/
+}*
 
 function drawTriangle(numPosition,limit,number)
 {
@@ -89,4 +101,4 @@ function drawTriangle(numPosition,limit,number)
             document.writeln("<br>");
         }
     }
-}
+}*/
