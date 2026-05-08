@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -36,6 +37,8 @@ jobs:
         uses: docker/scout-action@v1
         with:
           command: cves,recommendations
+          user: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
           file: ./Dockerfile
           sarif-file: sarif.output.json
           summary: true
