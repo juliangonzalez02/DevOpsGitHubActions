@@ -53,3 +53,7 @@ jobs:
       - name: List image tags in ACR
         run: |
           az acr repository show-tags --name ${{ secrets.ACR_NAME }} --repository ${{ env.IMAGE_NAME }} --output table
+      
+      - name: Deploy to Azure Container Apps
+        run: |
+          az containerapp update --name ca-devops-githubactions --resource_group devops-githubactions --image ${{ steps.acr.outputs.login_server }}/devops-githubactions:${{ github.sha }}
