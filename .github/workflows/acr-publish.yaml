@@ -56,4 +56,4 @@ jobs:
       
       - name: Deploy to Azure Container Apps
         run: |
-          az containerapp update --name ca-devops-githubactions --resource_group devops-githubactions --image ${{ steps.acr.outputs.login_server }}/devops-githubactions:${{ github.sha }}
+          az containerapp update --name ca-devops-githubactions --resource-group devops-githubactions --image ${{ steps.acr.outputs.login_server }}/devops-githubactions:${{ github.sha }}
