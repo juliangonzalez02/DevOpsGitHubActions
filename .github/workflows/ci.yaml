@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+env:
+  PR_IMAGE_NAME: devops-githubactions:ci-scan
+
 jobs:
   validate:
     name: Validate app
@@ -40,3 +43,30 @@ jobs:
 
     - name: Build app
       run: npm run build
+
+  docker-security:
+    name: Build and scan Docker image
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub for Docker Scout
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker image
+      run: docker build -t ${{ env.PR_IMAGE_NAME }}
+
+    - name: Scan Docker image with Docker Scout
+      uses: docker/scout-action@v1
+      with:
+        command: cves,recommendations
+        image: local://${{ env.PR_IMAGE_NAME }}
+        only-severities: critical,high
+        exit-code: true
+        write-comment: false

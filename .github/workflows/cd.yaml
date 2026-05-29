@@ -1,0 +1,131 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  IMAGE_REPOSITORY: devops-githubactions
+  RESOURCE_GROUP: rg-devops-githubactions
+
+jobs:
+  publish:
+    name: Build, scan, and push image to ACR
+    runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Verify Azure login
+        run: az account show --output table
+      
+      - name: Get ACR login server
+        id: acr
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show --name ${{ secrets.ACR_NAME }} --query loginServer --output tsv)
+          echo "login_server=$ACR_LOGIN_SERVER" >> "$GITHUB_OUTPUT"
+
+      - name: Set image name
+        id: image
+        run: |
+          IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Log in to Docker Hub for Docker Scout
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ steps.image.outputs.image }}
+
+      - name: Scan SHA-tagged image with Docker Scout
+        uses: docker/scout-action@v1
+        with:
+          command: cves,recommendations
+          image: local://${{ steps.image.output.image }}
+          only-severities: critical,high
+          exit-code: true
+          write-comment: false
+
+      - name: Push SHA-tagged image
+        run: |
+          docker push ${{ steps.image.outputs.image }}
+      
+  deploy-dev:
+    name: Deploy SHA-tagged image to dev with Bicep
+    runs-on: ubuntu-latest
+    needs: publish
+    environment:
+      name: dev
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy dev Container app
+        run: |
+          az deployment group create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --template-file infra/container-app.bicep \
+          --parameters infra/dev.bicepparam
+          --parameters imageName="${{ needs.publish.outputs.image }}" \
+          --parameters acrName="${{ secrets.ACR_NAME }}"
+
+    deploy-prod:
+      name: Deploy same SHA-tagged image to prod with Bicep
+      runs-on: ubuntu-latest
+      needs:
+        - publish
+        - deploy-dev
+      environment:
+        name: prod
+      
+      steps:
+        - name: Check out repository
+          uses: actions/checkout@v4
+
+        - name: Log in to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - name: Deploy prod Container App
+          run: |
+            az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file infra/container-app.bicep \
+            --parameters infra/prod.bicepparam
+            --parameters imageName="${{ needs.publish.outputs.image }}"
+            --parameters acrName="${{ secrets.ACR_NAME }}"
