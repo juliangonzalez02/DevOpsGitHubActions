@@ -60,7 +60,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker image
-      run: docker build -t ${{ env.PR_IMAGE_NAME }}
+      run: docker build -t ${{ env.PR_IMAGE_NAME }} .
 
     - name: Scan Docker image with Docker Scout
       uses: docker/scout-action@v1
