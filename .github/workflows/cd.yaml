@@ -59,7 +59,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ steps.image.outputs.image }}
+          docker build -t ${{ steps.image.outputs.image }} .
 
       - name: Scan SHA-tagged image with Docker Scout
         uses: docker/scout-action@v1
