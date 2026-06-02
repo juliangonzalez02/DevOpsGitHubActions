@@ -3,4 +3,5 @@ dist/
 .env
 .DS_Store
 npm-debug.log
-credential.json
+credential-dev.json
+credential-prod.json
