@@ -17,7 +17,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2024-03-01' existing
     name: containerAppEnvironmentName
 }
 
-resource acr 'Microsoft/ContainerRegistry/registries@2023-07-01' existing = {
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
     name: acrName
 }
 
