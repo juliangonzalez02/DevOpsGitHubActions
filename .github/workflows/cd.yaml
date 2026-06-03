@@ -12,7 +12,7 @@ permissions:
 
 env:
   IMAGE_REPOSITORY: devops-githubactions
-  RESOURCE_GROUP: rg-devops-githubactions
+  RESOURCE_GROUP: devops-githubactions
 
 jobs:
   publish:
