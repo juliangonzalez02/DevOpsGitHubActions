@@ -65,7 +65,7 @@ jobs:
         uses: docker/scout-action@v1
         with:
           command: cves,recommendations
-          image: local://${{ steps.image.output.image }}
+          image: local://${{ steps.image.outputs.image }}
           only-severities: critical,high
           exit-code: false                              # False for now because image doesn't have fixed version yet
           write-comment: false
@@ -97,7 +97,7 @@ jobs:
           az deployment group create \
           --resource-group ${{ env.RESOURCE_GROUP }} \
           --template-file infra/container-app.bicep \
-          --parameters infra/dev.bicepparam
+          --parameters infra/dev.bicepparam \
           --parameters imageName="${{ needs.publish.outputs.image }}" \
           --parameters acrName="${{ secrets.ACR_NAME }}"
 
@@ -126,6 +126,6 @@ jobs:
           az deployment group create \
           --resource-group ${{ env.RESOURCE_GROUP }} \
           --template-file infra/container-app.bicep \
-          --parameters infra/prod.bicepparam
-          --parameters imageName="${{ needs.publish.outputs.image }}"
+          --parameters infra/prod.bicepparam \
+          --parameters imageName="${{ needs.publish.outputs.image }}" \
           --parameters acrName="${{ secrets.ACR_NAME }}"
