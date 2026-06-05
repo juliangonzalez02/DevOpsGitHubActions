@@ -48,6 +48,10 @@ jobs:
           IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
+      - name: Debug image output
+        run: |
+          echo "Step output image=${{ steps.image.outputs.image }}"
+
       - name: Log in to Azure Container Registry
         run: az acr login --name ${{ secrets.ACR_NAME }}
 
