@@ -109,7 +109,7 @@ jobs:
         run: |
           echo "RESOURCE_GROUP=${{ env.RESOURCE_GROUP }}"
           echo "ACR_NAME=${{ secrets.ACR_NAME }}"
-          echo "IMAGE=$IMAGE"
+          echo "IMAGE=${{ steps.image.outputs.image }}"
           az account show --output table
           az group show --name "${{ env.RESOURCE_GROUP }}" --output table
 
@@ -119,7 +119,7 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file infra/container-app.bicep \
             --parameters infra/dev.bicepparam \
-            --parameters imageName="$IMAGE" \
+            --parameters imageName="${{ steps.image.outputs.image }}" \
             --parameters acrName="${{ secrets.ACR_NAME }}"
 
   deploy-prod:
@@ -163,5 +163,5 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file infra/container-app.bicep \
             --parameters infra/prod.bicepparam \
-            --parameters imageName="$IMAGE" \
+            --parameters imageName="${{ steps.image.outputs.image }}" \
             --parameters acrName="${{ secrets.ACR_NAME }}"
