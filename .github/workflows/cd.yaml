@@ -92,14 +92,23 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Debug deployment values
+        run: |
+          echo "RESOURCE_GROUP=${{ env.RESOURCE_GROUP }}"
+          echo "ACR_NAME=${{ secrets.ACR_NAME }}"
+          echo "IMAGE=${{ needs.publish.outputs.image }}"
+          az account show --output table
+          az group show --name "${{ env.RESOURCE_GROUP }}" --output table
+
+      
       - name: Deploy dev Container app
         run: |
           az deployment group create \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --template-file infra/container-app.bicep \
-          --parameters infra/dev.bicepparam \
-          --parameters imageName="${{ needs.publish.outputs.image }}" \
-          --parameters acrName="${{ secrets.ACR_NAME }}"
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file infra/container-app.bicep \
+            --parameters infra/dev.bicepparam \
+            --parameters imageName="${{ needs.publish.outputs.image }}" \
+            --parameters acrName="${{ secrets.ACR_NAME }}"
 
   deploy-prod:
     name: Deploy same SHA-tagged image to prod with Bicep
@@ -124,8 +133,8 @@ jobs:
       - name: Deploy prod Container App
         run: |
           az deployment group create \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --template-file infra/container-app.bicep \
-          --parameters infra/prod.bicepparam \
-          --parameters imageName="${{ needs.publish.outputs.image }}" \
-          --parameters acrName="${{ secrets.ACR_NAME }}"
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file infra/container-app.bicep \
+            --parameters infra/prod.bicepparam \
+            --parameters imageName="${{ needs.publish.outputs.image }}" \
+            --parameters acrName="${{ secrets.ACR_NAME }}"
