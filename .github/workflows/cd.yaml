@@ -19,9 +19,6 @@ jobs:
     name: Build, scan, and push image to ACR
     runs-on: ubuntu-latest
 
-    outputs:
-      image: ${{ steps.image.outputs.image }}
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -47,10 +44,6 @@ jobs:
         run: |
           IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-
-      - name: Debug image output
-        run: |
-          echo "Step output image=${{ steps.image.outputs.image }}"
 
       - name: Log in to Azure Container Registry
         run: az acr login --name ${{ secrets.ACR_NAME }}
@@ -96,6 +89,21 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Verify Azure login
+        run: az account show --output table
+      
+      - name: Get ACR login server
+        id: acr
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show --name ${{ secrets.ACR_NAME }} --query loginServer --output tsv)
+          echo "login_server=$ACR_LOGIN_SERVER" >> "$GITHUB_OUTPUT"
+
+      - name: Set image name
+        id: image
+        run: |
+          IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
       - name: Debug deployment values
         run: |
           echo "RESOURCE_GROUP=${{ env.RESOURCE_GROUP }}"
@@ -104,7 +112,6 @@ jobs:
           az account show --output table
           az group show --name "${{ env.RESOURCE_GROUP }}" --output table
 
-      
       - name: Deploy dev Container app
         run: |
           az deployment group create \
@@ -133,6 +140,21 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify Azure login
+        run: az account show --output table
+      
+      - name: Get ACR login server
+        id: acr
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show --name ${{ secrets.ACR_NAME }} --query loginServer --output tsv)
+          echo "login_server=$ACR_LOGIN_SERVER" >> "$GITHUB_OUTPUT"
+
+      - name: Set image name
+        id: image
+        run: |
+          IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
 
       - name: Deploy prod Container App
         run: |
