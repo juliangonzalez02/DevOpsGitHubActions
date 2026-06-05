@@ -113,6 +113,15 @@ jobs:
           az account show --output table
           az group show --name "${{ env.RESOURCE_GROUP }}" --output table
 
+      - name: Validate Bicep template
+        run: |
+          az deployment group validate \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --template-file infra/container-app.bicep \
+          --parameters infra/dev.bicepparam \
+          --parameters imageName="${{ steps.image.outputs.image }}" \
+          --parameters acrName="${{ secrets.ACR_NAME }}"
+      
       - name: Deploy dev Container app
         run: |
           az deployment group create \
@@ -120,7 +129,8 @@ jobs:
             --template-file infra/container-app.bicep \
             --parameters infra/dev.bicepparam \
             --parameters imageName="${{ steps.image.outputs.image }}" \
-            --parameters acrName="${{ secrets.ACR_NAME }}"
+            --parameters acrName="${{ secrets.ACR_NAME }}" \
+            --debug
 
   deploy-prod:
     name: Deploy same SHA-tagged image to prod with Bicep
