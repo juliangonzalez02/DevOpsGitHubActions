@@ -1,8 +1,9 @@
 using './container-app.bicep'
 
-param containerAppName = 'ca-devops-githubactons-prod'
+param containerAppName = 'ca-devops-githubactions-prod'
 param containerAppEnvironmentName = 'cae-devops-githubactions'
-param acrName = 'REPLACE_WITH_ACR'
+param managedIdentityName = 'id-devops-githubactions-prod'
+param acrName = 'REPLACE_WITH_GITHUB_ACTIONS'
 param imageName = 'REPLACE_WITH_IMAGE'
 param targetPort = 80
 param minReplicas = 0

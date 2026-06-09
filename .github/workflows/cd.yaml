@@ -132,10 +132,6 @@ jobs:
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
 
-      - name: Wait for role assignment to propagate
-        run: |
-          sleep 30
-
   deploy-prod:
     name: Deploy same SHA-tagged image to prod with Bicep
     runs-on: ubuntu-latest
@@ -180,7 +176,3 @@ jobs:
             --parameters imageName="${{ steps.image.outputs.image }}" \
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
-
-      - name: Wait for role assignment to propagate
-        run: |
-          sleep 30

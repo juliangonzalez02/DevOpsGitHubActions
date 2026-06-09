@@ -4,6 +4,7 @@ param containerAppName string
 param containerAppEnvironmentName string
 param acrName string
 param imageName string
+param managedIdentityName string
 
 param containerName string = 'web'
 param targetPort int = 80
@@ -21,11 +22,29 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
     name: acrName
 }
 
+resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+    name: managedIdentityName
+    location: location
+}
+
+resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+    name: guid(acr.id, identity.id, acrPullRoleDefinitionId)
+    scope: acr
+    properties: {
+        roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleDefinitionId)
+        principalId: identity.properties.principalId
+        principalType: 'ServicePrincipal'
+    }
+}
+
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
     name: containerAppName
     location: location
     identity: {
-        type: 'SystemAssigned'
+        type: 'UserAssigned'
+        userAssignedIdentities: {
+            '${identity.id}': {}
+        }
     }
     properties: {
         managedEnvironmentId: containerAppEnv.id
@@ -34,7 +53,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             registries: [
                 {
                     server: acr.properties.loginServer
-                    identity: 'system'
+                    identity: identity.id
                 }
             ]
             ingress: {
@@ -66,19 +85,13 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             }
         }
     }
-}
-
-resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-    name: guid(acr.id, containerApp.id, acrPullRoleDefinitionId)
-    scope: acr
-    properties: {
-        roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleDefinitionId)
-        principalId: containerApp.identity.principalId
-        principalType: 'ServicePrincipal'
-    }
+    dependsOn: [
+        acrPullAssignment
+    ]
 }
 
 output containerAppName string = containerApp.name
 output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
-output principalId string = containerApp.identity.principalId
+output managedIdentityName string = identity.name
+output managedIdentityPrincipalId string = identity.properties.principalId
 output acrLoginServer string = acr.properties.loginServer
