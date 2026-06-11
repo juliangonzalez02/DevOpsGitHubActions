@@ -121,6 +121,17 @@ jobs:
           --parameters infra/dev.bicepparam \
           --parameters imageName="${{ steps.image.outputs.image }}" \
           --parameters acrName="${{ secrets.ACR_NAME }}"
+
+      - name: Deploy identity infrastructure
+        run: |
+          az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file infra/identity-infra.bicep \
+            --parameters infra/dev.bicepparam \
+            --debug
+
+      - name: Wait for identity to propogate
+        run: sleep 2m
       
       - name: Deploy dev Container app
         run: |
@@ -166,7 +177,7 @@ jobs:
         run: |
           IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-
+      
       - name: Deploy prod Container App
         run: |
           az deployment group create \
