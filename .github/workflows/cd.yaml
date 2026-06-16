@@ -1,7 +1,11 @@
 name: CD
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -18,6 +22,7 @@ jobs:
   publish:
     name: Build, scan, and push image to ACR
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Check out repository
@@ -122,12 +127,13 @@ jobs:
           --parameters imageName="${{ steps.image.outputs.image }}" \
           --parameters acrName="${{ secrets.ACR_NAME }}"
 
-      - name: Deploy identity infrastructure
+      - name: Deploy identity infrastructure for dev
         run: |
           az deployment group create \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file infra/identity-infra.bicep \
-            --parameters infra/dev.bicepparam \
+            --parameters managedIdentityName="id-devops-githubactions-dev" \
+            --parameters acrName="${{ secrets.ACR_NAME }}"
             --debug
 
       - name: Wait for identity to propogate
@@ -177,6 +183,18 @@ jobs:
         run: |
           IMAGE="${{ steps.acr.outputs.login_server }}/${{ env.IMAGE_REPOSITORY }}:${{ github.sha }}"
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy identity infrastructure for prod
+        run: |
+          az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file infra/identity-infra.bicep \
+            --parameters managedIdentityName="id-devops-githubactions-prod" \
+            --parameters acrName="${{ secrets.ACR_NAME }}"
+            --debug
+
+      - name: Wait for identity to propogate
+        run: sleep 2m
       
       - name: Deploy prod Container App
         run: |

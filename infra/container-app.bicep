@@ -75,4 +75,5 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
 
 output containerAppName string = containerApp.name
 output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
+output managedIdentityName string = identity.name
 output acrLoginServer string = acr.properties.loginServer
