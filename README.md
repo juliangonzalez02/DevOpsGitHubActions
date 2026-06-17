@@ -38,3 +38,21 @@ In order for the continuous deployment pipeline to successfully log in to Azure 
 * Contributor on the resource group of the project: allows GitHub Actions to deploy/update Azure resources with Bicep
 * AcrPush on the private ACR: allows GitHub Actions to push the Docker image to Azure Container Registry
 * User Access Administrator on the private ACR: allows GitHub Actions to create the AcrPull role assignment for the Container Apps managed identities
+
+The Service Principal uses three federated credentials to enforce security gates at each stage of the deployment process: main branch, development environment, and production environment.
+
+## Proof of Concept
+
+![Prod awaiting approval](images/Deployment_Approval.png)
+
+<br>
+
+Production deployment awaiting approval after a success development deployment.
+
+<br>
+
+![Prod awaiting approval](images/Image_Vul.png)
+
+<br>
+
+CI pipeline failed due to vulnerabilties in base image.
