@@ -133,7 +133,7 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file infra/identity-infra.bicep \
             --parameters managedIdentityName="id-devops-githubactions-dev" \
-            --parameters acrName="${{ secrets.ACR_NAME }}"
+            --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
 
       - name: Wait for identity to propogate
@@ -190,7 +190,7 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file infra/identity-infra.bicep \
             --parameters managedIdentityName="id-devops-githubactions-prod" \
-            --parameters acrName="${{ secrets.ACR_NAME }}"
+            --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
 
       - name: Wait for identity to propogate
