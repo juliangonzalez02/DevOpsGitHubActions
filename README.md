@@ -51,14 +51,16 @@ Application and Container environments require extensive monitoring to ensure 1.
 
 ![Prod awaiting approval](images/Deployment_Approval.png)
 
-<br>
-
 Production deployment awaiting approval after a success development deployment.
 
 <br>
 
-![Prod awaiting approval](images/Image_Vul.png)
+![Image Vulnerabilities](images/Image_Vul.png)
+
+CI pipeline failed due to vulnerabilties in base image.
 
 <br>
 
-CI pipeline failed due to vulnerabilties in base image.
+![Supply-Chain Vulnerabilities](images/Supply_Chain.png)
+
+CI pipeline failed due to vulnerabilities in supply-chain.
