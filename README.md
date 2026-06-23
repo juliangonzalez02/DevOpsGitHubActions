@@ -41,6 +41,12 @@ In order for the continuous deployment pipeline to successfully log in to Azure 
 
 The Service Principal uses three federated credentials to enforce security gates at each stage of the deployment process: main branch, development environment, and production environment.
 
+#### Monitoring and Observability
+
+Application and Container environments require extensive monitoring to ensure 1. Successful deployments 2. Healthy apps/containers. For the containers, there are two alerts for both the dev and prod container apps. The alert shown in the picture below is to record potential crashes or failed revisions, which triggers an email to myself. The second alert will provide notification when there are requests that return 5xx errors, indicating server-side issues with the container environment.
+
+![Alert for replicas](images/Alert_Replicas.png)
+
 ## Proof of Concept
 
 ![Prod awaiting approval](images/Deployment_Approval.png)

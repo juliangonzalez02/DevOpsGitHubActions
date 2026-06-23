@@ -136,7 +136,7 @@ jobs:
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
 
-      - name: Wait for identity to propogate
+      - name: Wait for identity to propagate
         run: sleep 2m
       
       - name: Deploy dev Container app
@@ -148,6 +148,21 @@ jobs:
             --parameters imageName="${{ steps.image.outputs.image }}" \
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
+      
+      - name: Wait for dev Container app to propagate
+        run: sleep 30
+
+      - name: Smoke test dev Container App
+        run: |
+          APP_FQDN=$(az containerapp show \
+            --name ca-devops-githubactions-dev \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query properties.configuration.ingress.fqdn \
+            --output tsv)
+
+          echo "Testing https://$APP_FQDN"
+
+          curl --fail --silent --show-error "https://$APP_FQDN"
 
   deploy-prod:
     name: Deploy same SHA-tagged image to prod with Bicep
@@ -193,7 +208,7 @@ jobs:
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
 
-      - name: Wait for identity to propogate
+      - name: Wait for identity to propagate
         run: sleep 2m
       
       - name: Deploy prod Container App
@@ -205,3 +220,18 @@ jobs:
             --parameters imageName="${{ steps.image.outputs.image }}" \
             --parameters acrName="${{ secrets.ACR_NAME }}" \
             --debug
+
+      - name: Wait for prod Container app to propagate
+        run: sleep 30
+
+      - name: Smoke test prod Container App
+        run: |
+          APP_FQDN=$(az containerapp show \
+            --name ca-devops-githubactions-prod \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query properties.configuration.ingress.fqdn \
+            --output tsv)
+
+          echo "Testing https://$APP_FQDN"
+
+          curl --fail --silent --show-error "https://$APP_FQDN"
