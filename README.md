@@ -64,3 +64,15 @@ CI pipeline failed due to vulnerabilties in base image.
 ![Supply-Chain Vulnerabilities](images/Supply_Chain.png)
 
 CI pipeline failed due to vulnerabilities in supply-chain.
+
+<br>
+
+![ACR Repo](images/ACR_Repo.png)
+
+The CD pipeline pushed the SHA-tagged image to Azure Container Registry.
+
+<br>
+
+![Container App](images/CA_Dev.png)
+
+The development Container App instance is running the SHA-tagged image from ACR.
